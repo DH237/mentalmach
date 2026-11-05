@@ -18,13 +18,13 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>Mental Mach</title>
 <style>
-:root{--bg:#edf1ef;--card:#fbfcfb;--tx:#0e2230;--mut:#5b6f7c;--ac:#0e5a8a;--act:#fff;--ok:#157a4f;--ko:#b42318;--bd:#cfd9d6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#edf1ef;--card:#fbfcfb;--tx:#0e2230;--mut:#5b6f7c;--ac:#0e5a8a;--act:#fff;--ok:#157a4f;--ko:#b42318;--bd:#cfd9d6;box-sizing:border-box}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a141c;--card:#12212d;--tx:#e8eff3;--mut:#8fa5b3;--ac:#f2b23a;--act:#1a1203;--ok:#4cc38a;--ko:#ff8a7a;--bd:#24384a;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#0a141c;--card:#12212d;--tx:#e8eff3;--mut:#8fa5b3;--ac:#f2b23a;--act:#1a1203;--ok:#4cc38a;--ko:#ff8a7a;--bd:#24384a;color-scheme:dark}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:480px;margin:0 auto;padding:30px 16px 12px}
+main{max-width:480px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 12px)}
 h1{font-size:40px;margin:8px 0 0;letter-spacing:-.02em;line-height:1.1}
 .tag{margin:4px 0 14px;font-size:17px;font-weight:600;color:var(--ac)}
 .ft{margin-top:28px;font-size:13px;line-height:1.45;color:var(--mut)}
