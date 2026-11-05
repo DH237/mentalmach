@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<!-- Mental Mach - Copyright (c) 2026 DH. Tous droits réservés / All rights reserved. Voir le fichier LICENSE. -->
+
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e5a8a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mental Mach">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="Mental Mach : entraînement au calcul mental, avec un mode dédié aux pilotes d'aviation.">
+<meta name="author" content="DH">
+<meta name="copyright" content="© 2026 DH. Tous droits réservés.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>Mental Mach</title>
+<style>
+:root{--bg:#edf1ef;--card:#fbfcfb;--tx:#0e2230;--mut:#5b6f7c;--ac:#0e5a8a;--act:#fff;--ok:#157a4f;--ko:#b42318;--bd:#cfd9d6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a141c;--card:#12212d;--tx:#e8eff3;--mut:#8fa5b3;--ac:#f2b23a;--act:#1a1203;--ok:#4cc38a;--ko:#ff8a7a;--bd:#24384a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0a141c;--card:#12212d;--tx:#e8eff3;--mut:#8fa5b3;--ac:#f2b23a;--act:#1a1203;--ok:#4cc38a;--ko:#ff8a7a;--bd:#24384a;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:480px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:40px;margin:8px 0 0;letter-spacing:-.02em;line-height:1.1}
+.tag{margin:4px 0 14px;font-size:17px;font-weight:600;color:var(--ac)}
+.ft{margin-top:28px;font-size:13px;line-height:1.45;color:var(--mut)}
+h2{font-size:14px;font-weight:600;color:var(--mut);margin:22px 0 8px}
+.mut{color:var(--mut)}
+input[type=range]{width:100%;margin:4px 0;accent-color:var(--ac)}
+.rl{list-style:none;padding:0;margin:20px 0 0}
+.rl li{padding:10px 12px;margin-bottom:8px;border-radius:12px;border:1px solid var(--bd);border-left-width:6px;background:var(--card);font-variant-numeric:tabular-nums}
+.rl li.good{border-left-color:var(--ok)}.rl li.bad{border-left-color:var(--ko)}
+.seg.wrap{flex-wrap:wrap}
+.seg.wrap button{flex:1 1 calc(50% - 4px)}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;padding:13px 6px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:12px;font:inherit}
+.seg button.on{background:var(--ac);color:var(--act);border-color:var(--ac);font-weight:600}
+.main,.sec{display:block;width:100%;padding:16px;border-radius:14px;font:inherit;font-weight:600;margin-top:16px;border:1px solid var(--ac)}
+.main{background:var(--ac);color:var(--act)}
+.sec{background:transparent;color:var(--ac)}
+.bar{display:flex;justify-content:space-between;color:var(--mut);font-variant-numeric:tabular-nums}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:24px 16px;margin:16px 0;text-align:center;font-size:24px;font-weight:600;min-height:130px;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.row{display:flex;gap:8px;align-items:center}
+.row input{flex:1;min-width:0;font-size:26px;padding:12px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);text-align:right}
+#neg{padding:14px;font-size:20px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx)}
+#u{min-width:40px;color:var(--mut)}
+#fb{min-height:28px;margin-top:12px;font-weight:600;white-space:pre-line}
+.good{color:var(--ok)}.bad{color:var(--ko)}
+#rt{font-size:52px;margin:28px 0 4px;font-variant-numeric:tabular-nums}
+button:focus-visible,input:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+<section id="home">
+  <h1>Mental Mach</h1>
+  <p class="tag">Le calcul mental, du quotidien au cockpit</p>
+  <p class="mut">Séries sans calculatrice, sans question en double. Plus ta réponse est proche de la valeur exacte, plus tu gagnes de points (100 maximum par question).</p>
+  <h2>Mode</h2>
+  <div class="seg" id="sm"><button data-v="gen" class="on">Général</button><button data-v="pil">Pilote</button></div>
+  <h2>Difficulté</h2>
+  <div class="seg" id="sd"><button data-v="0">Facile</button><button data-v="1" class="on">Moyen</button><button data-v="2">Difficile</button></div>
+  <h2>Type d'exercice</h2>
+  <div class="seg wrap" id="st"></div>
+  <h2>Nombre de questions : <span id="nv">10</span><span id="mx"></span></h2>
+  <input type="range" id="nr" min="5" max="50" step="1" value="10" aria-label="Nombre de questions">
+  <p id="best" class="mut"></p>
+  <button class="main" id="go">Commencer la série</button>
+  <p class="ft">© 2026 DH. Tous droits réservés.<br>Outil d'entraînement : ses valeurs approchées ne doivent pas servir à préparer ou conduire un vol réel.</p>
+</section>
+<section id="quiz" hidden>
+  <div class="bar"><span id="pr"></span><span id="sc"></span><span id="tm"></span></div>
+  <div class="card"><div id="q"></div></div>
+  <div class="row"><button id="neg" aria-label="Changer le signe">±</button><input id="a" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="Réponse"><span id="u"></span></div>
+  <div id="fb" role="status"></div>
+  <button class="main" id="ok">Valider</button>
+  <button class="sec" id="quit">Quitter la série</button>
+</section>
+<section id="end" hidden>
+  <h2>Série terminée</h2>
+  <div id="rt"></div>
+  <p id="rd"></p>
+  <p id="rb" class="mut"></p>
+  <button class="main" id="again">Rejouer</button>
+  <button class="sec" id="back">Changer de mode</button>
+  <ol id="rl" class="rl"></ol>
+</section>
+</main>
+<script>
+const $=i=>document.getElementById(i),R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a,P=a=>a[R(0,a.length-1)];
+let N=10,T=10,NP=10;
+const f=n=>Number(n.toFixed(2)).toLocaleString("fr-FR");
+const q=(t,a,u,tol,abs,m)=>({t,a,u:u||"",tol:tol||0,abs:abs||0,m:m||""});
+// Méthodes de calcul affichées quand la réponse est totalement hors tolérance
+const ch=(a,b,p)=>{let r=b,s=[],x=a;for(const v of [1000,100,10,1]){let u=Math.floor(r/v)*v;r-=u;if(u){x=p?x+u:x-u;s.push((p?"+ ":"− ")+f(u)+" = "+f(x))}}return "Décompose "+f(b)+" en milliers, centaines, dizaines et unités, et "+(p?"ajoute":"retire")+"-les un à un : "+f(a)+" "+s.join(", ")};
+const ml=(a,b)=>{let X=Math.max(a,b),Y=Math.min(a,b);if(X<10)return "Table de multiplication de "+X+" ou de "+Y;let T=Math.floor(X/10)*10,U=X%10;return U?f(X)+" × "+Y+" = ("+T+" × "+Y+") + ("+U+" × "+Y+") = "+f(T*Y)+" + "+f(U*Y)+" = "+f(X*Y):f(X)+" × "+Y+" = "+(X/10)+" × "+Y+" × 10 = "+f(X/10*Y)+" × 10 = "+f(X*Y)};
+const pm=(p,n)=>{let d=n/10,r=n*p/100;if(p===10)return "10 % = diviser par 10 : "+f(n)+" ÷ 10 = "+f(r);if(p===50)return "50 % = la moitié : "+f(n)+" ÷ 2 = "+f(r);if(p===25)return "25 % = le quart (moitié de la moitié) : "+f(n)+" ÷ 2 ÷ 2 = "+f(r);if(p===75)return "75 % = trois quarts : "+f(n)+" ÷ 4 = "+f(n/4)+", puis × 3 = "+f(r);let k=Math.floor(p/10),m=p%10,s="10 % de "+f(n)+" = "+f(d);if(m===0)return s+" ; "+p+" % = "+k+" × "+f(d)+" = "+f(r);if(m===5)return s+" ; 5 % = la moitié de 10 % = "+f(d/2)+(k?" ; "+p+" % = "+k+" × "+f(d)+" + "+f(d/2)+" = "+f(r):"");return s+" ; 1 % = "+f(n/100)+" ; "+p+" % = "+k+" × "+f(d)+" + "+m+" × "+f(n/100)+" = "+f(r)};
+const dv=(a,b)=>{let q=a/b,T=Math.floor(q/10)*10,U=q-T;if(!T)return "Cherche le nombre qui, multiplié par "+b+", donne "+f(a)+" : "+b+" × "+q+" = "+f(a);let s=b+" × "+T+" = "+f(b*T)+" ; il reste "+f(a)+" − "+f(b*T)+" = "+f(a-b*T);return U?s+" ; "+b+" × "+U+" = "+f(b*U)+" ; "+T+" + "+U+" = "+q:s+" ; donc "+f(a)+" ÷ "+b+" = "+q};
+const mKm=v=>{let A=2*v,d=A/10;return f(v)+" NM × 2 = "+f(A)+" ; 10 % de "+f(A)+" = "+f(d)+" ; on retire ce 10 % puis on rajoute son quart ("+f(d/4)+") : "+f(A)+" − "+f(d)+" + "+f(d/4)+" = "+f(A-d+d/4)+" km (1 NM ≈ 1,85 km)"};
+const mNm=v=>{let H=v/2,d=H/10;return f(v)+" km ÷ 2 = "+f(H)+" ; 10 % de "+f(H)+" = "+f(d)+" ; 8 % ≈ "+f(d)+" − "+f(d/5)+" = "+f(d-d/5)+" ; "+f(H)+" + "+f(d-d/5)+" = "+f(H+d-d/5)+" NM (1 km ≈ 0,54 NM)"};
+const mTv=(g,x)=>g+" kt = "+f(g/60)+" NM par minute (vitesse ÷ 60) ; temps = "+x+" ÷ "+f(g/60)+" = "+f(x/g*60)+" min";
+const mDs=h=>"3° ≈ 300 ft par NM : "+f(h)+" ÷ 3 = "+f(h/3)+" ; ÷ 100 = "+f(h/300)+" NM";
+const mCap=(h,s,g,n)=>{let r=h+s*g,t=String(h).padStart(3,"0")+" "+(s>0?"+":"−")+" "+g+" = "+r;if(r>360)t+=" ; plus de 360, donc − 360 = "+String(n).padStart(3,"0");else if(r<1)t+=" ; zéro ou moins, donc + 360 = "+String(n).padStart(3,"0");return (g===180?"Demi-tour : on ajoute 180. ":s>0?"Virage à droite : on ajoute l'angle. ":"Virage à gauche : on retire l'angle. ")+t};
+// Modules généraux : d = difficulté (0, 1, 2)
+const G=[
+ d=>{let r=[[10,99],[50,999],[100,9999]][d],a=R(...r),b=R(...r),p=Math.random()<.5;if(!p&&b>a){[a,b]=[b,a]}return q(a+(p?" + ":" − ")+b,p?a+b:a-b,"",0,0,ch(a,b,p))},
+ d=>{let a=R(...[[2,9],[6,15],[11,25]][d]),b=R(...[[2,9],[6,15],[11,99]][d]);return q(a+" × "+b,a*b,"",0,0,ml(a,b))},
+ d=>{let p=P([[10,25,50],[5,10,15,20,40,75],[5,15,35,45,65,12]][d]),n=R(...[[2,20],[4,60],[10,99]][d])*10;return q(p+" % de "+f(n),n*p/100,"",0,0,pm(p,n))},
+ d=>{let b=R(...[[2,9],[3,12],[6,25]][d]),Q=R(...[[2,9],[4,20],[11,99]][d]),a=b*Q;return q(f(a)+" ÷ "+b,Q,"",0,0,dv(a,b))}
+];
+const NM=6076.12,tn=a=>Math.tan(a*Math.PI/180),tl=a=>.1+.004*a,p3=n=>String(n).padStart(3,"0");
+// Modules pilote : tolérance relative (tol) ou absolue (abs)
+const Pl=[
+ d=>{if(Math.random()<.5){let v=R(...[[5,50],[10,150],[20,400]][d]);return q(v+" NM = ? km",v*1.852,"km",.03,0,mKm(v))}let v=R(...[[1,10],[3,30],[5,60]][d])*10;return q(v+" km = ? NM",v/1.852,"NM",.03,0,mNm(v))},
+ d=>{let gs=P([[60,120],[90,120,150],[85,95,105,115,135]][d]),x=R(...[[1,8],[2,12],[3,20]][d])*10;return q("Vitesse sol "+gs+" kt, distance "+x+" NM. Temps de vol ?",x/gs*60,"min",.04,0,mTv(gs,x))},
+ d=>{let h=[R(1,6)*3000,R(2,12)*1000,R(20,120)*100][d];return q("Perdre "+f(h)+" ft en descente à 3°. À quelle distance commencer ?",h/300,"NM",.05,0,mDs(h))},
+ d=>{let a=R(1,[6,12,25][d]),v=R(0,2);
+  if(v===0){let x=R(...[[2,6],[2,10],[2,12]][d]);return q("Pente de "+a+"° : gain de hauteur sur "+x+" NM ?",tn(a)*NM*x,"ft",tl(a),0,"Règle du 1 pour 60 : 1° ≈ 100 ft par NM ; gain ≈ "+a+" × 100 × "+x+" = "+f(a*100)+" × "+x+" = "+f(a*100*x)+" ft (la valeur exacte est un peu plus élevée)")}
+  
+  if(v===2){let D=[P([5,10,20]),R(4,25),R(3,40)][d],H=Math.max(500,Math.round(tn(a)*NM*D/500)*500);return q((P([0,1])?"Monter":"Descendre")+" de "+f(H)+" ft sur "+D+" NM : quelle pente ?",Math.atan(H/(NM*D))*180/Math.PI,"°",.2,0,"1° ≈ 100 ft par NM : "+f(H)+" ÷ "+D+" = "+f(H/D)+" ft par NM ; ÷ 100 = "+f(H/D/100)+"° (la valeur exacte est un peu plus basse)")}let H=R(...[[1,4],[2,8],[3,15]][d])*1000;return q("Pente de "+a+"° : quelle distance pour prendre "+f(H)+" ft de hauteur ?",H/(tn(a)*NM),"NM",tl(a),0,"1° ≈ 100 ft par NM : "+f(H)+" ÷ ("+a+" × 100) = "+f(H)+" ÷ "+f(a*100)+" = "+f(H/(a*100))+" NM (la valeur exacte est un peu plus basse)")},
+ d=>{let g=P([[90,180],[45,60,90,180],[30,45,60,90,180]][d]),s=g===180?1:P([1,-1]),h=[R(1,36)*10,R(1,72)*5,R(1,360)][d],n=((h+s*g-1)%360+360)%360+1;
+  let t=g===180?"Cap "+p3(h)+"°. Demi-tour (180°). Nouveau cap ?":"Cap "+p3(h)+"°. Virage de "+g+"° à "+(s>0?"droite":"gauche")+". Nouveau cap ?";
+  return {...q(t,n,"°",0,0,mCap(h,s,g,n)),hdg:1}},
+ d=>{let gs=[P([60,120]),P([90,100,120,150,180]),R(17,52)*5][d],m=[R(1,6)*10,R(1,12)*5,R(7,58)][d];return q("Vitesse sol "+gs+" kt pendant "+m+" min. Distance parcourue ?",gs*m/60,"NM",.03,0,gs+" kt = "+f(gs/60)+" NM par minute (vitesse ÷ 60) ; "+f(gs/60)+" × "+m+" min = "+f(gs*m/60)+" NM")},
+ d=>{let v=R(0,3),mn=[P([10,15,30,45,60]),R(2,12)*5,R(7,58)][d],gs=[P([60,120]),P([90,120,150,180]),R(17,52)*5][d],ds=[R(1,6)*30,R(2,20)*10,R(25,380)][d];
+  if(v<2){let ff=[P([600,1200,1800,2400]),R(5,25)*100,R(60,330)*10][d];return v===0?q("Consommation "+f(ff)+" lb/h. Vol de "+mn+" min. Carburant consommé ?",ff*mn/60,"lb",.04,0,f(ff)+" lb/h ÷ 60 = "+f(ff/60)+" lb par minute ; × "+mn+" min = "+f(ff*mn/60)+" lb"):q("Consommation "+f(ff)+" lb/h. Distance "+ds+" NM à "+gs+" kt. Carburant consommé ?",ff*ds/gs,"lb",.04,0,"temps = "+ds+" NM ÷ "+gs+" kt = "+f(ds/gs)+" h ("+f(ds/gs*60)+" min) ; carburant = "+f(ff)+" × "+f(ds/gs)+" = "+f(ff*ds/gs)+" lb")}
+  let ff=[P([10,20,30,40]),R(8,45),R(8,45)][d];return v===2?q("Consommation "+ff+" kg/min. Vol de "+mn+" min. Carburant consommé ?",ff*mn,"kg",.04,0,ff+" kg/min × "+mn+" min = "+f(ff*mn)+" kg"):q("Consommation "+ff+" kg/min. Distance "+ds+" NM à "+gs+" kt. Carburant consommé ?",ff*ds/gs*60,"kg",.04,0,"temps = "+ds+" NM ÷ "+gs+" kt × 60 = "+f(ds/gs*60)+" min ; carburant = "+ff+" × "+f(ds/gs*60)+" = "+f(ff*ds/gs*60)+" kg")},
+ d=>{if(Math.random()<.5){let v=[P([.5,1,2]),P([.2,.3,.5,.8,1.5,2.5]),P([.1,.15,.25,.4,.7,1.2,3.5])][d];return q(f(v)+" NM = ? ft",v*NM,"ft",.08,0,"1 NM ≈ 6 000 ft (6 076 exactement) : "+f(v)+" × 6 000 = "+f(v*6000)+" ft")}let h=[P([3000,6000,12000]),R(1,20)*1000,R(5,150)*100][d];return q(f(h)+" ft = ? NM",h/NM,"NM",.08,0,"1 NM ≈ 6 000 ft : "+f(h)+" ÷ 6 000 = "+f(h/6000)+" NM")},
+ d=>{if(Math.random()<.5){let h=[P([1000,2000,5000,10000]),R(2,40)*500,R(5,350)*100][d];return q(f(h)+" ft = ? m",h*.3048,"m",.1,0,"× 0,3 (÷ 10 puis × 3) : "+f(h)+" ÷ 10 = "+f(h/10)+" ; × 3 = "+f(h*.3)+" m")}let m=[P([100,300,500,1000]),R(2,30)*100,R(5,120)*50][d];return q(f(m)+" m = ? ft",m/.3048,"ft",.1,0,"× 3,3 (× 3 puis + 10 %) : "+f(m)+" × 3 = "+f(m*3)+" ; + 10 % ("+f(m*.3)+") = "+f(m*3.3)+" ft")},
+ d=>{let z=[R(1,8)*1000,R(2,20)*1000,R(5,40)*1000+R(0,1)*500][d];return q("Altitude "+f(z)+" ft : température ISA ?",15-z/500,"°C",0,1.5,"ISA : 15 °C − 2 °C par 1 000 ft : 15 − 2 × "+f(z/1000)+" = 15 − "+f(z/500)+" = "+f(15-z/500)+" °C")},
+ d=>{let z=[P([2000,4000,5000,8000,10000]),R(2,20)*1000,R(8,50)*500][d],s=Math.sqrt(Math.pow(1-6.8755856e-6*z,4.2558797)),v=[P([100,120,150,180,200]),R(10,30)*10,R(8,30)*10][d];return P([0,1])?q("Altitude "+f(z)+" ft (ISA). IAS "+v+" kt : TAS ?",v/s,"kt",.06,0,"TAS ≈ IAS + 2 % par 1 000 ft : "+f(z/1000)+" × 2 = "+f(z/500)+" % ; 1 % de "+v+" = "+f(v/100)+" ; "+v+" + "+f(z/500)+" × "+f(v/100)+" = "+f(v*(1+z/50000))+" kt"):q("Altitude "+f(z)+" ft (ISA). TAS "+v+" kt : IAS ?",v*s,"kt",.06,0,"IAS ≈ TAS ÷ (1 + 2 % par 1 000 ft) : facteur = 1 + "+f(z/50000)+" = "+f(1+z/50000)+" ; "+v+" ÷ "+f(1+z/50000)+" = "+f(v/(1+z/50000))+" kt")}
+];
+function load(){try{return JSON.parse(localStorage.getItem("cm2"))||{}}catch(e){return {}}}
+function save(o){try{localStorage.setItem("cm2",JSON.stringify(o))}catch(e){}}
+let st=load(),S={m:"gen",d:1,t:"all"},C,i,ok,pts,t0,tmr,done,seen,H=[];
+const key=()=>S.m+S.d+"_"+S.t+"_"+N;
+const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const kk=t=>{let m=t.match(/^(.+?) (×|\+|% de) (.+)$/);return m?m[2]+[m[1],m[3]].sort().join("|"):t};
+const fmt=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+function seg(id,k){$(id).onclick=e=>{let b=e.target.closest("button");if(!b)return;S[k]=k==="d"?+b.dataset.v:b.dataset.v;[...$(id).children].forEach(x=>x.classList.toggle("on",x===b));best()}}
+seg("sm","m");seg("sd","d");
+$("nr").oninput=e=>{N=NP=+e.target.value;$("nv").textContent=N;try{localStorage.setItem("cm2n",N)}catch(x){}best()};
+try{let s=+localStorage.getItem("cm2n");if(s>=5&&s<=50)N=NP=s}catch(x){}
+$("nr").value=N;$("nv").textContent=N;
+const GN=["Additions et soustractions","Multiplications","Pourcentages","Divisions"],PN=["Conversion NM ↔ km","Temps de vol","Descente à 3°","Pentes","Calculs de cap","Distance parcourue","Carburant","NM ↔ ft","ft ↔ m","Température ISA","TAS ↔ IAS"];
+function rt(){let n=S.m==="gen"?GN:PN,h='<button data-v="all" class="'+(S.t==="all"?"on":"")+'">Tous les types</button>';n.forEach((x,j)=>{h+='<button data-v="'+j+'" class="'+(S.t===""+j?"on":"")+'">'+x+'</button>'});$("st").innerHTML=h;lim();best()}
+function lim(){let L=S.m==="gen"?G:Pl,s=new Set();for(let j=0;j<4000&&s.size<60;j++){s.add(kk((S.t==="all"?P(L):L[+S.t])(S.d).t))}let c=Math.min(50,s.size),r=$("nr");N=Math.min(NP,c);r.min=Math.min(5,c);r.max=c;r.value=N;$("nv").textContent=N;$("mx").textContent=c<50?" · maximum "+c+" pour ces options":""}
+$("st").onclick=e=>{let b=e.target.closest("button");if(!b)return;S.t=b.dataset.v;rt()};
+$("sm").addEventListener("click",e=>{if(e.target.closest("button")){S.t="all";rt()}});
+$("sd").addEventListener("click",e=>{if(e.target.closest("button")){lim();best()}});
+rt();
+function best(){let b=st[key()];$("best").textContent=b?"Meilleur score : "+b.s+" / "+N*100+" pts en "+fmt(b.t):"Pas encore de score dans cette catégorie."}
+function show(id){["home","quiz","end"].forEach(x=>$(x).hidden=x!==id)}
+function tick(){$("tm").textContent=fmt(Math.floor((Date.now()-t0)/1000))}
+function start(){i=0;ok=0;pts=0;T=N;H=[];resetQ();seen=new Set();t0=Date.now();clearInterval(tmr);tmr=setInterval(tick,250);tick();show("quiz");next()}
+function next(){if(i>=T)return end();let n=0;do{let L=S.m==="gen"?G:Pl;C=(S.t==="all"?P(L):L[+S.t])(S.d)}while(seen.has(kk(C.t))&&++n<2000);if(seen.has(kk(C.t))){T=i;return end()}seen.add(kk(C.t));i++;done=false;$("pr").textContent=i+"/"+T;$("sc").textContent="Score "+pts;$("q").textContent=C.t;$("u").textContent=C.u;$("a").value="";$("fb").textContent="";$("fb").className="";$("ok").textContent="Valider";$("a").focus()}
+function submit(){
+  if(done)return next();
+  let raw=$("a").value.trim(),x=Number(raw.replace(",",".").replace(/\s/g,"").replace("−","-"));
+  if(raw===""||isNaN(x))return;
+  let W=Math.max(C.tol*Math.abs(C.a),C.abs,.011),e=C.hdg?(((x-C.a)%360)+360)%360:Math.abs(x-C.a),p=C.hdg?(e===0?100:0):Math.round(100*Math.max(0,1-e/(2*W))),good=p>=50;
+  done=true;if(good)ok++;pts+=p;H.push({t:C.t,x:raw,a:(C.hdg?p3(C.a):f(C.a))+" "+C.u,p,good});
+  $("sc").textContent="Score "+pts;
+  let fb=$("fb");fb.className=good?"good":"bad";
+  fb.textContent=(good?"✓ Dans la tolérance":"✗ Hors tolérance")+" · +"+p+" pt"+(p>1?"s":"")+"\nValeur exacte : "+(C.hdg?p3(C.a):f(C.a))+" "+C.u+(!C.hdg&&e>.011?" · écart : "+f(e)+" "+C.u:"")+(p===0&&C.m?"\nMéthode : "+C.m:"");
+  $("ok").textContent=i>=T?"Voir le résultat":"Question suivante";
+}
+function end(){
+  clearInterval(tmr);
+  let t=Math.floor((Date.now()-t0)/1000),b=st[key()],nb=T===N&&(!b||pts>b.s||(pts===b.s&&t<b.t));
+  if(nb){st[key()]={s:pts,t};save(st)}
+  $("rt").textContent=pts+" / "+T*100;$("rd").textContent="Temps : "+fmt(t)+" · "+ok+"/"+T+" dans la tolérance";
+  $("rb").textContent=T<N?"Série raccourcie à "+T+" questions : il n'existe pas assez de questions différentes dans cette catégorie.":nb?"Nouveau record !":"Record : "+b.s+" / "+N*100+" pts en "+fmt(b.t);
+  $("rl").innerHTML=H.map((r,j)=>'<li class="'+(r.good?"good":"bad")+'">'+(j+1)+". "+esc(r.t)+"<br>Ta réponse : "+esc(r.x)+" · exact : "+esc(r.a)+" · +"+r.p+" pt"+(r.p>1?"s":"")+"</li>").join("");show("end");scrollTo(0,0);
+}
+$("go").onclick=start;$("again").onclick=start;$("ok").onclick=submit;
+$("a").onkeydown=e=>{if(e.key==="Enter")submit()};
+$("neg").onclick=()=>{let a=$("a");a.value=a.value.startsWith("-")?a.value.slice(1):"-"+a.value;a.focus()};
+$("back").onclick=()=>{best();show("home")};
+let qt;
+function resetQ(){clearTimeout(qt);let b=$("quit");delete b.dataset.c;b.textContent="Quitter la série"}
+$("quit").onclick=()=>{let b=$("quit");if(b.dataset.c){clearInterval(tmr);resetQ();best();show("home")}else{b.dataset.c="1";b.textContent="Confirmer : quitter sans enregistrer";qt=setTimeout(resetQ,3000)}};
+best();
+if("serviceWorker" in navigator)addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})});
+</script>
+</body>
+</html>
