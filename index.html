@@ -101,13 +101,15 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ac);outline-off
 html.lock,html.lock body{height:100vh;height:100dvh;overflow:hidden;overscroll-behavior:none}
 html.lock main{height:100vh;height:100dvh;overflow-y:auto;overscroll-behavior:none}
 .kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
-.kp button{height:46px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit;font-size:22px;font-weight:600;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;transition:transform .08s,background .15s}
+.kp button{height:clamp(42px,8.4vh,74px);height:clamp(42px,8.4dvh,74px);border-radius:14px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit;font-size:26px;font-weight:600;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;transition:transform .08s,background .15s}
 .kp button:active{transform:scale(.94);background:var(--bd)}
-#quiz .card{min-height:96px;margin:12px 0;padding:16px}
-.ka{position:relative;margin-top:8px}
+#quiz:not([hidden]){display:flex;flex-direction:column;height:100%;min-height:0}
+#quiz .card{min-height:96px;margin:auto 0 12px;padding:16px;flex:none}
+#quiz .row{margin-bottom:auto;flex:none}
+.ka{position:relative;margin-top:12px;flex:none}
 .ka #fb{display:none;position:absolute;inset:0;margin:0;min-height:0;overflow:auto;background:var(--bg);padding:2px 0}
 .ka.done #fb{display:block}
-@media (max-height:620px){.kp button{height:40px}#quiz .card{min-height:80px;margin:8px 0}}
+@media (max-height:620px){#quiz .card{min-height:80px}}
 #quiz .main{margin-top:10px;padding:13px}
 </style>
 </head>
