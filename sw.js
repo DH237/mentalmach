@@ -1,7 +1,7 @@
 // Service worker de Mental Mach : permet l'installation et le fonctionnement hors ligne.
 // À chaque nouvelle version publiée, change le numéro ci-dessous (v1 -> v2, etc.)
 // pour que les téléphones récupèrent les nouveaux fichiers.
-const VERSION = "mentalmach-v6";
+const VERSION = "mentalmach-v7";
 const FICHIERS = [
   "./",
   "index.html",
