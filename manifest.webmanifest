@@ -1,7 +1,7 @@
 {
-  "name": "Mental Mach – calcul mental et pilotes",
-  "short_name": "Mental Mach",
-  "description": "Mental Mach : entraînement au calcul mental, avec un mode dédié aux pilotes d'aviation.",
+  "name": "Mach Math – calcul mental et pilotes",
+  "short_name": "Mach Math",
+  "description": "Mach Math : entraînement au calcul mental, avec un mode dédié aux pilotes d'aviation.",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",
