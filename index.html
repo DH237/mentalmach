@@ -59,6 +59,10 @@ input[type=range]{width:100%;margin:4px 0;accent-color:var(--ac)}
 .rl li.good{border-left-color:var(--ok)}.rl li.bad{border-left-color:var(--ko)}
 .seg.wrap{flex-wrap:wrap}
 .seg.wrap button{flex:1 1 calc(50% - 4px)}
+.seg.gen{display:grid;grid-template-columns:repeat(4,1fr)}
+.seg.gen button{padding:6px 2px;font-size:12px;line-height:1.2;overflow-wrap:anywhere;hyphens:auto}
+.seg.gen button[data-v="all"]{grid-column:1/-1;padding:13px 6px;font-size:inherit}
+.seg.gen button:not([data-v="all"]){aspect-ratio:1}
 .seg{display:flex;gap:8px}
 .seg button{flex:1;padding:13px 6px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:12px;font:inherit}
 .seg button.on{background:var(--ac);color:var(--act);border-color:var(--ac);font-weight:600}
@@ -172,7 +176,7 @@ $("nr").oninput=e=>{N=NP=+e.target.value;$("nv").textContent=N;try{localStorage.
 try{let s=+localStorage.getItem("cm2n");if(s>=5&&s<=50)N=NP=s}catch(x){}
 $("nr").value=N;$("nv").textContent=N;
 const GN=["Additions et soustractions","Multiplications","Pourcentages","Divisions"],PN=["Conversion NM ↔ km","Temps de vol","Descente à 3°","Pentes","Calculs de cap","Distance parcourue","Carburant","NM ↔ ft","ft ↔ m","Température ISA","TAS ↔ IAS"];
-function rt(){let n=S.m==="gen"?GN:PN,h='<button data-v="all" class="'+(S.t==="all"?"on":"")+'">Tous les types</button>';n.forEach((x,j)=>{h+='<button data-v="'+j+'" class="'+(S.t===""+j?"on":"")+'">'+x+'</button>'});$("st").innerHTML=h;lim();best()}
+function rt(){let n=S.m==="gen"?GN:PN,h='<button data-v="all" class="'+(S.t==="all"?"on":"")+'">Tous les types</button>';n.forEach((x,j)=>{h+='<button data-v="'+j+'" class="'+(S.t===""+j?"on":"")+'">'+x+'</button>'});$("st").innerHTML=h;$("st").classList.toggle("gen",S.m==="gen");lim();best()}
 function lim(){let L=S.m==="gen"?G:Pl,s=new Set();for(let j=0;j<4000&&s.size<60;j++){s.add(kk((S.t==="all"?P(L):L[+S.t])(S.d).t))}let c=Math.min(50,s.size),r=$("nr");N=Math.min(NP,c);r.min=Math.min(5,c);r.max=c;r.value=N;$("nv").textContent=N;$("mx").textContent=c<50?" · maximum "+c+" pour ces options":""}
 $("st").onclick=e=>{let b=e.target.closest("button");if(!b)return;S.t=b.dataset.v;rt()};
 $("sm").addEventListener("click",e=>{if(e.target.closest("button")){S.t="all";rt()}});
