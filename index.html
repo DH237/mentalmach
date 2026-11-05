@@ -90,6 +90,11 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ac);outline-off
 #home .main{margin-top:8px;padding:12px}
 #home #best{margin:6px 0 0}
 #home .ft{margin-top:10px;font-size:11px;line-height:1.35}
+.qt{display:flex;align-items:center;gap:10px;min-height:40px;margin-bottom:10px}
+#quit{width:40px;height:40px;border-radius:50%;border:1px solid var(--bd);background:var(--card);color:var(--ac);display:grid;place-items:center;padding:0;flex:none;transition:background .2s,color .2s,transform .15s}
+#quit:active{transform:scale(.92)}
+#quit.c{background:var(--ko);color:var(--card);border-color:var(--ko)}
+#qh{font-size:14px;color:var(--mut)}
 </style>
 </head>
 <body>
@@ -110,13 +115,13 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ac);outline-off
   <p class="ft">© 2026 DH. Tous droits réservés.<br>Outil d'entraînement : ses valeurs approchées ne doivent pas servir à préparer ou conduire un vol réel.</p>
 </section>
 <section id="quiz" hidden>
+  <div class="qt"><button id="quit" aria-label="Quitter la série" title="Quitter la série"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><span id="qh" aria-live="polite"></span></div>
   <div class="bar"><span id="pr"></span><span id="sc"></span><span id="tm"></span></div>
   <div class="pb" aria-hidden="true"><div id="pf"></div></div>
   <div class="card"><div id="q"></div><span id="pp" class="pp" aria-hidden="true"></span></div>
   <div class="row"><button id="neg" aria-label="Changer le signe">±</button><input id="a" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="Réponse"><span id="u"></span></div>
   <div id="fb" role="status"></div>
   <button class="main" id="ok">Valider</button>
-  <button class="sec" id="quit">Quitter la série</button>
 </section>
 <section id="end" hidden>
   <h2>Série terminée</h2>
@@ -221,8 +226,8 @@ $("a").onkeydown=e=>{if(e.key==="Enter")submit()};
 $("neg").onclick=()=>{let a=$("a");a.value=a.value.startsWith("-")?a.value.slice(1):"-"+a.value;a.focus()};
 $("back").onclick=()=>{best();show("home")};
 let qt;
-function resetQ(){clearTimeout(qt);let b=$("quit");delete b.dataset.c;b.textContent="Quitter la série"}
-$("quit").onclick=()=>{let b=$("quit");if(b.dataset.c){clearInterval(tmr);resetQ();best();show("home")}else{b.dataset.c="1";b.textContent="Confirmer : quitter sans enregistrer";qt=setTimeout(resetQ,3000)}};
+function resetQ(){clearTimeout(qt);let b=$("quit");delete b.dataset.c;b.classList.remove("c");$("qh").textContent=""}
+$("quit").onclick=()=>{let b=$("quit");if(b.dataset.c){clearInterval(tmr);resetQ();best();show("home")}else{b.dataset.c="1";b.classList.add("c");$("qh").textContent="Touche encore pour quitter sans enregistrer";qt=setTimeout(resetQ,3000)}};
 best();
 if("serviceWorker" in navigator)addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})});
 </script>
