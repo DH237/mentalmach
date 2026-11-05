@@ -84,12 +84,12 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ac);outline-off
 #home h1{font-size:30px;margin:0}
 #home .tag{margin:2px 0 4px;font-size:15px}
 #home h2{margin:9px 0 5px}
-#home .seg button{padding:8px 4px}
-#home .seg.wrap:not(.gen) button{flex:1 1 calc(33.33% - 6px);font-size:12.5px;line-height:1.15;padding:6px 3px}
+#home .seg button{padding:6px 4px}
+#home .seg.wrap:not(.gen) button{flex:1 1 calc(33.33% - 6px);font-size:12.5px;line-height:1.15;padding:5px 3px}
 #home .seg.gen button[data-v="all"]{padding:11px 6px}
 #home .main{margin-top:8px;padding:12px}
 #home #best{margin:6px 0 0}
-#home .ft{margin-top:10px;font-size:11px;line-height:1.35}
+#home .ft{margin-top:6px;font-size:11px;line-height:1.35}
 .qt{display:flex;align-items:center;gap:12px;min-height:40px}
 .qt .bar{flex:1}
 .qt.c .bar{display:none}
@@ -111,6 +111,7 @@ html.lock main{height:100vh;height:100dvh;overflow-y:auto;overscroll-behavior:no
 .ka.done #fb{display:block}
 @media (max-height:620px){#quiz .card{min-height:80px}}
 #quiz .main{margin-top:10px;padding:13px}
+#tm.low{color:var(--ko);font-weight:700}
 </style>
 </head>
 <body>
@@ -118,14 +119,15 @@ html.lock main{height:100vh;height:100dvh;overflow-y:auto;overscroll-behavior:no
 <section id="home">
   <h1>Mental Mach</h1>
   <p class="tag">Le calcul mental, du quotidien au cockpit</p>
-  <h2>Mode</h2>
-  <div class="seg" id="sm"><button data-v="gen" class="on">Général</button><button data-v="pil">Pilote</button></div>
+  <div class="seg" id="sm" style="margin-top:10px"><button data-v="gen" class="on">Général</button><button data-v="pil">Pilote</button></div>
+  <div class="seg" id="sf" style="margin-top:8px"><button data-v="s" class="on">Série</button><button data-v="c">⏱ Contre la montre</button></div>
   <h2>Difficulté</h2>
   <div class="seg" id="sd"><button data-v="0">Facile</button><button data-v="1" class="on">Moyen</button><button data-v="2">Difficile</button></div>
   <h2>Type d'exercice</h2>
   <div class="seg wrap" id="st"></div>
-  <h2>Nombre de questions : <span id="nv">10</span><span id="mx"></span></h2>
-  <input type="range" id="nr" min="5" max="50" step="1" value="10" aria-label="Nombre de questions">
+  <div id="nq"><h2>Nombre de questions : <span id="nv">10</span><span id="mx"></span></h2>
+  <input type="range" id="nr" min="5" max="50" step="1" value="10" aria-label="Nombre de questions"></div>
+  <div id="cn" hidden><h2>Contre la montre : 2 minutes</h2><p class="mut" style="margin:0">Réponds à un maximum de questions : ton score est le total des points.</p></div>
   <p id="best" class="mut"></p>
   <button class="main" id="go">Commencer la série</button>
   <p class="ft">© 2026 DH. Tous droits réservés.<br>Outil d'entraînement : ses valeurs approchées ne doivent pas servir à préparer ou conduire un vol réel.</p>
@@ -194,14 +196,15 @@ const PA=[
 const Pl=[d=>PA[P([0,6,7])](d),PA[9],d=>PA[P([1,4])](d),PA[2],PA[3],PA[5],PA[8]];
 function load(){try{let o=JSON.parse(localStorage.getItem("cm2"))||{};if(localStorage.getItem("cm2v")!=="3"){for(const k in o)if(/^pil\d_\d+_/.test(k))delete o[k];localStorage.setItem("cm2",JSON.stringify(o));localStorage.setItem("cm2v","3")}return o}catch(e){return {}}}
 function save(o){try{localStorage.setItem("cm2",JSON.stringify(o))}catch(e){}}
-let st=load(),S={m:"gen",d:1,t:"all"},C,i,ok,pts,t0,tmr,done,seen,H=[];
-const key=()=>S.m+S.d+"_"+S.t+"_"+N;
+let st=load(),S={m:"gen",d:1,t:"all",f:"s"},C,i,ok,pts,t0,tmr,done,seen,H=[],deck=[];
+const key=()=>S.m+S.d+"_"+S.t+"_"+(S.f==="c"?"c":N),CH=120;
 const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 function boom(){if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;let c=document.createElement("div");c.className="cf";c.setAttribute("aria-hidden","true");const col=["#f2b23a","#0e5a8a","#4cc38a","#ff8a7a","#8fd3ff"];for(let j=0;j<34;j++){let p=document.createElement("i");p.style.background=col[j%col.length];p.style.left=R(38,62)+"%";p.style.setProperty("--x",R(-170,170)+"px");p.style.setProperty("--r",R(-540,540)+"deg");p.style.animationDelay=(R(0,150)/1000)+"s";c.appendChild(p)}document.body.appendChild(c);setTimeout(()=>c.remove(),2000)}
 const kk=t=>{let m=t.match(/^(.+?) (×|\+|% de) (.+)$/);return m?m[2]+[m[1],m[3]].sort().join("|"):t};
 const fmt=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
 function seg(id,k){$(id).onclick=e=>{let b=e.target.closest("button");if(!b)return;S[k]=k==="d"?+b.dataset.v:b.dataset.v;[...$(id).children].forEach(x=>x.classList.toggle("on",x===b));best()}}
 seg("sm","m");seg("sd","d");
+$("sf").addEventListener("click",e=>{let b=e.target.closest("button");if(!b)return;S.f=b.dataset.v;[...$("sf").children].forEach(x=>x.classList.toggle("on",x===b));$("nq").hidden=S.f==="c";$("cn").hidden=S.f!=="c";$("go").textContent=S.f==="c"?"Lancer le chrono":"Commencer la série";best()});
 $("nr").oninput=e=>{N=NP=+e.target.value;$("nv").textContent=N;try{localStorage.setItem("cm2n",N)}catch(x){}best()};
 try{let s=+localStorage.getItem("cm2n");if(s>=5&&s<=50)N=NP=s}catch(x){}
 $("nr").value=N;$("nv").textContent=N;
@@ -212,11 +215,16 @@ $("st").onclick=e=>{let b=e.target.closest("button");if(!b)return;S.t=b.dataset.
 $("sm").addEventListener("click",e=>{if(e.target.closest("button")){S.t="all";rt()}});
 $("sd").addEventListener("click",e=>{if(e.target.closest("button")){lim();best()}});
 rt();
-function best(){let b=st[key()];$("best").textContent=b?"Meilleur score : "+b.s+" / "+N*100+" pts en "+fmt(b.t):"Pas encore de score dans cette catégorie."}
+function best(){let b=st[key()];$("best").textContent=b?(S.f==="c"?"Meilleur score : "+b.s+" pts en 2 min":"Meilleur score : "+b.s+" / "+N*100+" pts en "+fmt(b.t)):"Pas encore de score dans cette catégorie."}
 function show(id){document.documentElement.classList.toggle("lock",id==="quiz");["home","quiz","end"].forEach(x=>$(x).hidden=x!==id);let e=$(id);e.classList.remove("in");void e.offsetWidth;e.classList.add("in")}
-function tick(){$("tm").textContent=fmt(Math.floor((Date.now()-t0)/1000))}
-function start(){i=0;ok=0;pts=0;T=N;H=[];resetQ();seen=new Set();t0=Date.now();clearInterval(tmr);tmr=setInterval(tick,250);tick();show("quiz");next()}
-function next(){if(i>=T)return end();let n=0;do{let L=S.m==="gen"?G:Pl;C=(S.t==="all"?P(L):L[+S.t])(S.d)}while(seen.has(kk(C.t))&&++n<2000);if(seen.has(kk(C.t))){T=i;return end()}seen.add(kk(C.t));i++;done=false;$("ka").classList.remove("done");$("pr").textContent=i+"/"+T;$("pf").style.width=((i-1)/T*100)+"%";$("pp").className="pp";{let c=document.querySelector(".card");c.className="card";void c.offsetWidth;c.className="card in"}$("sc").textContent="Score "+pts;$("q").textContent=C.t;$("u").textContent=C.u;$("a").value="";$("fb").textContent="";$("fb").className="";$("ok").textContent="Valider"}
+function tick(){let ms=Date.now()-t0;if(S.f==="c"){let r=Math.max(0,CH-Math.floor(ms/1000));$("tm").textContent=fmt(r);$("tm").classList.toggle("low",r<=10);$("pf").style.width=Math.min(100,ms/(CH*10))+"%";if(ms>=CH*1000)end()}else $("tm").textContent=fmt(Math.floor(ms/1000))}
+function start(){i=0;ok=0;pts=0;T=S.f==="c"?Infinity:N;H=[];deck=[];$("tm").classList.remove("low");resetQ();seen=new Set();t0=Date.now();clearInterval(tmr);tmr=setInterval(tick,250);tick();show("quiz");next()}
+function draw(){let L=S.m==="gen"?G:Pl;if(S.t!=="all"){for(let n=0;n<2000;n++){let q=L[+S.t](S.d);if(!seen.has(kk(q.t)))return q}return L[+S.t](S.d)}
+  if(!deck.length){deck=L.map((_,j)=>j);for(let j=deck.length-1;j>0;j--){let k=R(0,j);[deck[j],deck[k]]=[deck[k],deck[j]]}}
+  let ty=deck.pop();for(let n=0;n<200;n++){let q=L[ty](S.d);if(!seen.has(kk(q.t)))return q}
+  for(let n=0;n<2000;n++){let q=P(L)(S.d);if(!seen.has(kk(q.t)))return q}
+  return L[ty](S.d)}
+function next(){if(i>=T)return end();C=draw();if(seen.has(kk(C.t))){if(S.f==="c"){seen.clear()}else{T=i;return end()}}seen.add(kk(C.t));i++;done=false;$("ka").classList.remove("done");$("pr").textContent=S.f==="c"?"Question "+i:i+"/"+T;if(S.f!=="c")$("pf").style.width=((i-1)/T*100)+"%";$("pp").className="pp";{let c=document.querySelector(".card");c.className="card";void c.offsetWidth;c.className="card in"}$("sc").textContent="Score "+pts;$("q").textContent=C.t;$("u").textContent=C.u;$("a").value="";$("fb").textContent="";$("fb").className="";$("ok").textContent="Valider"}
 function submit(){
   if(done)return next();
   let raw=$("a").value.trim(),x=Number(raw.replace(",",".").replace(/\s/g,"").replace("−","-"));
@@ -230,10 +238,10 @@ function submit(){
 }
 function end(){
   clearInterval(tmr);
-  let t=Math.floor((Date.now()-t0)/1000),b=st[key()],nb=T===N&&(!b||pts>b.s||(pts===b.s&&t<b.t));
+  let ch=S.f==="c",t=ch?CH:Math.floor((Date.now()-t0)/1000),b=st[key()],nb=ch?(!b||pts>b.s):T===N&&(!b||pts>b.s||(pts===b.s&&t<b.t));
   if(nb){st[key()]={s:pts,t};save(st)}
-  $("rt").textContent=pts+" / "+T*100;$("rd").textContent="Temps : "+fmt(t)+" · "+ok+"/"+T+" dans la tolérance";
-  $("rb").textContent=T<N?"Série raccourcie à "+T+" questions : il n'existe pas assez de questions différentes dans cette catégorie.":nb?(b?"Nouveau record !":"Premier score enregistré !"):"Record : "+b.s+" / "+N*100+" pts en "+fmt(b.t);
+  document.querySelector("#end h2").textContent=ch?"Temps écoulé !":"Série terminée";$("rt").textContent=ch?pts+" pts":pts+" / "+T*100;$("rd").textContent=ch?"Temps écoulé · "+ok+"/"+H.length+" dans la tolérance":"Temps : "+fmt(t)+" · "+ok+"/"+T+" dans la tolérance";
+  $("rb").textContent=ch?(nb?(b?"Nouveau record !":"Premier score enregistré !"):"Record : "+b.s+" pts"):T<N?"Série raccourcie à "+T+" questions : il n'existe pas assez de questions différentes dans cette catégorie.":nb?(b?"Nouveau record !":"Premier score enregistré !"):"Record : "+b.s+" / "+N*100+" pts en "+fmt(b.t);
   $("rl").innerHTML=H.map((r,j)=>'<li class="'+(r.good?"good":"bad")+'">'+(j+1)+". "+esc(r.t)+"<br>Ta réponse : "+esc(r.x)+" · exact : "+esc(r.a)+" · +"+r.p+" pt"+(r.p>1?"s":"")+"</li>").join("");show("end");scrollTo(0,0);{let r=$("rb");r.classList.remove("pop");void r.offsetWidth;if(nb&&b){r.classList.add("pop");boom()}}
 }
 ["ok","neg"].forEach(id=>$(id).addEventListener("pointerdown",e=>e.preventDefault()));
