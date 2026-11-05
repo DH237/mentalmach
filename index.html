@@ -31,6 +31,29 @@ h1{font-size:40px;margin:8px 0 0;letter-spacing:-.02em;line-height:1.1}
 h2{font-size:14px;font-weight:600;color:var(--mut);margin:22px 0 8px}
 .mut{color:var(--mut)}
 input[type=range]{width:100%;margin:4px 0;accent-color:var(--ac)}
+.card{position:relative;transition:border-color .25s}
+.pb{height:6px;border-radius:3px;background:var(--bd);overflow:hidden;margin-top:10px}
+#pf{height:100%;width:0;background:var(--ac);border-radius:3px;transition:width .45s cubic-bezier(.2,.7,.2,1)}
+.in{animation:in .28s cubic-bezier(.2,.7,.2,1)}
+.card.in{animation:in .22s cubic-bezier(.2,.7,.2,1)}
+.card.ok{animation:pulse .55s ease-out;border-color:var(--ok)}
+.card.ko{animation:shake .4s ease-in-out;border-color:var(--ko)}
+.pp{position:absolute;right:14px;top:10px;font-size:22px;font-weight:700;opacity:0;pointer-events:none}
+.pp.g{color:var(--ok)}.pp.b{color:var(--ko)}
+.pp.go{animation:rise .95s ease-out}
+#sc{display:inline-block}
+#sc.bump{animation:bump .3s ease-out}
+#rb.pop{animation:pop .6s cubic-bezier(.3,1.6,.5,1)}
+.cf{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:9}
+.cf i{position:absolute;top:36%;width:8px;height:12px;border-radius:2px;opacity:0;animation:fly 1.6s ease-out forwards}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(76,195,138,.55)}40%{transform:scale(1.03)}100%{transform:scale(1);box-shadow:0 0 0 14px rgba(76,195,138,0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+@keyframes rise{0%{opacity:0;transform:translateY(8px) scale(.8)}20%{opacity:1;transform:translateY(0) scale(1.1)}100%{opacity:0;transform:translateY(-34px) scale(1)}}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes fly{0%{opacity:1;transform:translate(0,0) rotate(0)}30%{opacity:1;transform:translate(calc(var(--x)*.6),-150px) rotate(calc(var(--r)*.4))}100%{opacity:0;transform:translate(var(--x),380px) rotate(var(--r))}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 .rl{list-style:none;padding:0;margin:20px 0 0}
 .rl li{padding:10px 12px;margin-bottom:8px;border-radius:12px;border:1px solid var(--bd);border-left-width:6px;background:var(--card);font-variant-numeric:tabular-nums}
 .rl li.good{border-left-color:var(--ok)}.rl li.bad{border-left-color:var(--ko)}
@@ -74,7 +97,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ac);outline-off
 </section>
 <section id="quiz" hidden>
   <div class="bar"><span id="pr"></span><span id="sc"></span><span id="tm"></span></div>
-  <div class="card"><div id="q"></div></div>
+  <div class="pb" aria-hidden="true"><div id="pf"></div></div>
+  <div class="card"><div id="q"></div><span id="pp" class="pp" aria-hidden="true"></span></div>
   <div class="row"><button id="neg" aria-label="Changer le signe">±</button><input id="a" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="Réponse"><span id="u"></span></div>
   <div id="fb" role="status"></div>
   <button class="main" id="ok">Valider</button>
@@ -139,6 +163,7 @@ function save(o){try{localStorage.setItem("cm2",JSON.stringify(o))}catch(e){}}
 let st=load(),S={m:"gen",d:1,t:"all"},C,i,ok,pts,t0,tmr,done,seen,H=[];
 const key=()=>S.m+S.d+"_"+S.t+"_"+N;
 const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+function boom(){if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;let c=document.createElement("div");c.className="cf";c.setAttribute("aria-hidden","true");const col=["#f2b23a","#0e5a8a","#4cc38a","#ff8a7a","#8fd3ff"];for(let j=0;j<34;j++){let p=document.createElement("i");p.style.background=col[j%col.length];p.style.left=R(38,62)+"%";p.style.setProperty("--x",R(-170,170)+"px");p.style.setProperty("--r",R(-540,540)+"deg");p.style.animationDelay=(R(0,150)/1000)+"s";c.appendChild(p)}document.body.appendChild(c);setTimeout(()=>c.remove(),2000)}
 const kk=t=>{let m=t.match(/^(.+?) (×|\+|% de) (.+)$/);return m?m[2]+[m[1],m[3]].sort().join("|"):t};
 const fmt=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
 function seg(id,k){$(id).onclick=e=>{let b=e.target.closest("button");if(!b)return;S[k]=k==="d"?+b.dataset.v:b.dataset.v;[...$(id).children].forEach(x=>x.classList.toggle("on",x===b));best()}}
@@ -154,10 +179,10 @@ $("sm").addEventListener("click",e=>{if(e.target.closest("button")){S.t="all";rt
 $("sd").addEventListener("click",e=>{if(e.target.closest("button")){lim();best()}});
 rt();
 function best(){let b=st[key()];$("best").textContent=b?"Meilleur score : "+b.s+" / "+N*100+" pts en "+fmt(b.t):"Pas encore de score dans cette catégorie."}
-function show(id){["home","quiz","end"].forEach(x=>$(x).hidden=x!==id)}
+function show(id){["home","quiz","end"].forEach(x=>$(x).hidden=x!==id);let e=$(id);e.classList.remove("in");void e.offsetWidth;e.classList.add("in")}
 function tick(){$("tm").textContent=fmt(Math.floor((Date.now()-t0)/1000))}
 function start(){i=0;ok=0;pts=0;T=N;H=[];resetQ();seen=new Set();t0=Date.now();clearInterval(tmr);tmr=setInterval(tick,250);tick();show("quiz");next()}
-function next(){if(i>=T)return end();let n=0;do{let L=S.m==="gen"?G:Pl;C=(S.t==="all"?P(L):L[+S.t])(S.d)}while(seen.has(kk(C.t))&&++n<2000);if(seen.has(kk(C.t))){T=i;return end()}seen.add(kk(C.t));i++;done=false;$("pr").textContent=i+"/"+T;$("sc").textContent="Score "+pts;$("q").textContent=C.t;$("u").textContent=C.u;$("a").value="";$("fb").textContent="";$("fb").className="";$("ok").textContent="Valider";$("a").focus()}
+function next(){if(i>=T)return end();let n=0;do{let L=S.m==="gen"?G:Pl;C=(S.t==="all"?P(L):L[+S.t])(S.d)}while(seen.has(kk(C.t))&&++n<2000);if(seen.has(kk(C.t))){T=i;return end()}seen.add(kk(C.t));i++;done=false;$("pr").textContent=i+"/"+T;$("pf").style.width=((i-1)/T*100)+"%";$("pp").className="pp";{let c=document.querySelector(".card");c.className="card";void c.offsetWidth;c.className="card in"}$("sc").textContent="Score "+pts;$("q").textContent=C.t;$("u").textContent=C.u;$("a").value="";$("fb").textContent="";$("fb").className="";$("ok").textContent="Valider";$("a").focus()}
 function submit(){
   if(done)return next();
   let raw=$("a").value.trim(),x=Number(raw.replace(",",".").replace(/\s/g,"").replace("−","-"));
@@ -165,7 +190,7 @@ function submit(){
   let W=Math.max(C.tol*Math.abs(C.a),C.abs,.011),e=C.hdg?(((x-C.a)%360)+360)%360:Math.abs(x-C.a),p=C.hdg?(e===0?100:0):Math.round(100*Math.max(0,1-e/(2*W))),good=p>=50;
   done=true;if(good)ok++;pts+=p;H.push({t:C.t,x:raw,a:(C.hdg?p3(C.a):f(C.a))+" "+C.u,p,good});
   $("sc").textContent="Score "+pts;
-  let fb=$("fb");fb.className=good?"good":"bad";
+  let fb=$("fb");fb.className=good?"good":"bad";void fb.offsetWidth;fb.className+=" in";{let c=document.querySelector(".card");c.className="card";void c.offsetWidth;c.className="card "+(good?"ok":"ko")}{let s=$("sc");s.classList.remove("bump");void s.offsetWidth;s.classList.add("bump");let pp=$("pp");pp.className="pp";void pp.offsetWidth;if(p>0){pp.textContent="+"+p;pp.className="pp go "+(good?"g":"b")}}$("pf").style.width=(i/T*100)+"%";
   fb.textContent=(good?"✓ Dans la tolérance":"✗ Hors tolérance")+" · +"+p+" pt"+(p>1?"s":"")+"\nValeur exacte : "+(C.hdg?p3(C.a):f(C.a))+" "+C.u+(!C.hdg&&e>.011?" · écart : "+f(e)+" "+C.u:"")+(p===0&&C.m?"\nMéthode : "+C.m:"");
   $("ok").textContent=i>=T?"Voir le résultat":"Question suivante";
 }
@@ -174,8 +199,8 @@ function end(){
   let t=Math.floor((Date.now()-t0)/1000),b=st[key()],nb=T===N&&(!b||pts>b.s||(pts===b.s&&t<b.t));
   if(nb){st[key()]={s:pts,t};save(st)}
   $("rt").textContent=pts+" / "+T*100;$("rd").textContent="Temps : "+fmt(t)+" · "+ok+"/"+T+" dans la tolérance";
-  $("rb").textContent=T<N?"Série raccourcie à "+T+" questions : il n'existe pas assez de questions différentes dans cette catégorie.":nb?"Nouveau record !":"Record : "+b.s+" / "+N*100+" pts en "+fmt(b.t);
-  $("rl").innerHTML=H.map((r,j)=>'<li class="'+(r.good?"good":"bad")+'">'+(j+1)+". "+esc(r.t)+"<br>Ta réponse : "+esc(r.x)+" · exact : "+esc(r.a)+" · +"+r.p+" pt"+(r.p>1?"s":"")+"</li>").join("");show("end");scrollTo(0,0);
+  $("rb").textContent=T<N?"Série raccourcie à "+T+" questions : il n'existe pas assez de questions différentes dans cette catégorie.":nb?(b?"Nouveau record !":"Premier score enregistré !"):"Record : "+b.s+" / "+N*100+" pts en "+fmt(b.t);
+  $("rl").innerHTML=H.map((r,j)=>'<li class="'+(r.good?"good":"bad")+'">'+(j+1)+". "+esc(r.t)+"<br>Ta réponse : "+esc(r.x)+" · exact : "+esc(r.a)+" · +"+r.p+" pt"+(r.p>1?"s":"")+"</li>").join("");show("end");scrollTo(0,0);{let r=$("rb");r.classList.remove("pop");void r.offsetWidth;if(nb&&b){r.classList.add("pop");boom()}}
 }
 $("go").onclick=start;$("again").onclick=start;$("ok").onclick=submit;
 $("a").onkeydown=e=>{if(e.key==="Enter")submit()};
