@@ -60,6 +60,8 @@ input[type=range]{width:100%;margin:2px 0;accent-color:var(--ac)}
 .seg.wrap{flex-wrap:wrap}
 .seg.wrap button{flex:1 1 calc(50% - 4px)}
 .seg.gen{display:grid;grid-template-columns:repeat(4,1fr)}
+.seg.pil{display:grid;grid-template-columns:repeat(12,1fr)}
+.seg.pil button[data-v="all"]{grid-column:1/-1}
 .seg.gen button{padding:0;line-height:1;font-size:28px}
 .seg.gen button[data-v="all"]{grid-column:1/-1;padding:13px 6px;font-size:inherit}
 .seg.gen button:not([data-v="all"]){aspect-ratio:1}
@@ -139,7 +141,6 @@ const dv=(a,b)=>{let q=a/b,T=Math.floor(q/10)*10,U=q-T;if(!T)return "Cherche le 
 const mKm=v=>{let A=2*v,d=A/10;return f(v)+" NM × 2 = "+f(A)+" ; 10 % de "+f(A)+" = "+f(d)+" ; on retire ce 10 % puis on rajoute son quart ("+f(d/4)+") : "+f(A)+" − "+f(d)+" + "+f(d/4)+" = "+f(A-d+d/4)+" km (1 NM ≈ 1,85 km)"};
 const mNm=v=>{let H=v/2,d=H/10;return f(v)+" km ÷ 2 = "+f(H)+" ; 10 % de "+f(H)+" = "+f(d)+" ; 8 % ≈ "+f(d)+" − "+f(d/5)+" = "+f(d-d/5)+" ; "+f(H)+" + "+f(d-d/5)+" = "+f(H+d-d/5)+" NM (1 km ≈ 0,54 NM)"};
 const mTv=(g,x)=>g+" kt = "+f(g/60)+" NM par minute (vitesse ÷ 60) ; temps = "+x+" ÷ "+f(g/60)+" = "+f(x/g*60)+" min";
-const mDs=h=>"3° ≈ 300 ft par NM : "+f(h)+" ÷ 3 = "+f(h/3)+" ; ÷ 100 = "+f(h/300)+" NM";
 const mCap=(h,s,g,n)=>{let r=h+s*g,t=String(h).padStart(3,"0")+" "+(s>0?"+":"−")+" "+g+" = "+r;if(r>360)t+=" ; plus de 360, donc − 360 = "+String(n).padStart(3,"0");else if(r<1)t+=" ; zéro ou moins, donc + 360 = "+String(n).padStart(3,"0");return (g===180?"Demi-tour : on ajoute 180. ":s>0?"Virage à droite : on ajoute l'angle. ":"Virage à gauche : on retire l'angle. ")+t};
 // Modules généraux : d = difficulté (0, 1, 2)
 const G=[
@@ -150,10 +151,9 @@ const G=[
 ];
 const NM=6076.12,tn=a=>Math.tan(a*Math.PI/180),tl=a=>.1+.004*a,p3=n=>String(n).padStart(3,"0");
 // Modules pilote : tolérance relative (tol) ou absolue (abs)
-const Pl=[
+const PA=[
  d=>{if(Math.random()<.5){let v=R(...[[5,50],[10,150],[20,400]][d]);return q(v+" NM = ? km",v*1.852,"km",.03,0,mKm(v))}let v=R(...[[1,10],[3,30],[5,60]][d])*10;return q(v+" km = ? NM",v/1.852,"NM",.03,0,mNm(v))},
  d=>{let gs=P([[60,120],[90,120,150],[85,95,105,115,135]][d]),x=R(...[[1,8],[2,12],[3,20]][d])*10;return q("Vitesse sol "+gs+" kt, distance "+x+" NM. Temps de vol ?",x/gs*60,"min",.04,0,mTv(gs,x))},
- d=>{let h=[R(1,6)*3000,R(2,12)*1000,R(20,120)*100][d];return q("Perdre "+f(h)+" ft en descente à 3°. À quelle distance commencer ?",h/300,"NM",.05,0,mDs(h))},
  d=>{let a=R(1,[6,12,25][d]),v=R(0,2);
   if(v===0){let x=R(...[[2,6],[2,10],[2,12]][d]);return q("Pente de "+a+"° : gain de hauteur sur "+x+" NM ?",tn(a)*NM*x,"ft",tl(a),0,"Règle du 1 pour 60 : 1° ≈ 100 ft par NM ; gain ≈ "+a+" × 100 × "+x+" = "+f(a*100)+" × "+x+" = "+f(a*100*x)+" ft (la valeur exacte est un peu plus élevée)")}
   
@@ -170,7 +170,9 @@ const Pl=[
  d=>{let z=[R(1,8)*1000,R(2,20)*1000,R(5,40)*1000+R(0,1)*500][d];return q("Altitude "+f(z)+" ft : température ISA ?",15-z/500,"°C",0,1.5,"ISA : 15 °C − 2 °C par 1 000 ft : 15 − 2 × "+f(z/1000)+" = 15 − "+f(z/500)+" = "+f(15-z/500)+" °C")},
  d=>{let z=[P([2000,4000,5000,8000,10000]),R(2,20)*1000,R(8,50)*500][d],s=Math.sqrt(Math.pow(1-6.8755856e-6*z,4.2558797)),v=[P([100,120,150,180,200]),R(10,30)*10,R(8,30)*10][d];return P([0,1])?q("Altitude "+f(z)+" ft (ISA). IAS "+v+" kt : TAS ?",v/s,"kt",.06,0,"TAS ≈ IAS + 2 % par 1 000 ft : "+f(z/1000)+" × 2 = "+f(z/500)+" % ; 1 % de "+v+" = "+f(v/100)+" ; "+v+" + "+f(z/500)+" × "+f(v/100)+" = "+f(v*(1+z/50000))+" kt"):q("Altitude "+f(z)+" ft (ISA). TAS "+v+" kt : IAS ?",v*s,"kt",.06,0,"IAS ≈ TAS ÷ (1 + 2 % par 1 000 ft) : facteur = 1 + "+f(z/50000)+" = "+f(1+z/50000)+" ; "+v+" ÷ "+f(1+z/50000)+" = "+f(v/(1+z/50000))+" kt")}
 ];
-function load(){try{return JSON.parse(localStorage.getItem("cm2"))||{}}catch(e){return {}}}
+// Ordre des boutons : conversions ensemble, puis V = D / T (temps de vol + distance parcourue), pente, cap, carburant, ISA
+const Pl=[PA[0],PA[6],PA[7],PA[9],d=>PA[P([1,4])](d),PA[2],PA[3],PA[5],PA[8]];
+function load(){try{let o=JSON.parse(localStorage.getItem("cm2"))||{};for(const k in o)if(/^pil\d_\d+_/.test(k))delete o[k];return o}catch(e){return {}}}
 function save(o){try{localStorage.setItem("cm2",JSON.stringify(o))}catch(e){}}
 let st=load(),S={m:"gen",d:1,t:"all"},C,i,ok,pts,t0,tmr,done,seen,H=[];
 const key=()=>S.m+S.d+"_"+S.t+"_"+N;
@@ -183,8 +185,8 @@ seg("sm","m");seg("sd","d");
 $("nr").oninput=e=>{N=NP=+e.target.value;$("nv").textContent=N;try{localStorage.setItem("cm2n",N)}catch(x){}best()};
 try{let s=+localStorage.getItem("cm2n");if(s>=5&&s<=50)N=NP=s}catch(x){}
 $("nr").value=N;$("nv").textContent=N;
-const GS=["+ −","×","%","÷"],GN=["Additions et soustractions","Multiplications","Pourcentages","Divisions"],PN=["Conversion NM ↔ km","Temps de vol","Descente à 3°","Pentes","Calculs de cap","Distance parcourue","Carburant","NM ↔ ft","ft ↔ m","Température ISA","TAS ↔ IAS"];
-function rt(){let n=S.m==="gen"?GN:PN,h='<button data-v="all" class="'+(S.t==="all"?"on":"")+'">Tous les types</button>';n.forEach((x,j)=>{h+='<button data-v="'+j+'" aria-label="'+x+'" title="'+x+'" class="'+(S.t===""+j?"on":"")+'">'+(S.m==="gen"?GS[j]:x)+'</button>'});$("st").innerHTML=h;$("st").classList.toggle("gen",S.m==="gen");lim();best()}
+const GS=["+ −","×","%","÷"],GN=["Additions et soustractions","Multiplications","Pourcentages","Divisions"],PN=["NM ↔ km","NM ↔ ft","ft ↔ m","TAS ↔ IAS","V = D / T","Pente = ΔFL / distance","Calculs de cap","Carburant","Température ISA"],PS=[3,3,3,3,4,4,4,6,6];
+function rt(){let n=S.m==="gen"?GN:PN,h='<button data-v="all" class="'+(S.t==="all"?"on":"")+'">Tous les types</button>';n.forEach((x,j)=>{h+='<button data-v="'+j+'" aria-label="'+x+'" title="'+x+'" class="'+(S.t===""+j?"on":"")+'">'+(S.m==="gen"?GS[j]:x)+'</button>'});$("st").innerHTML=h;$("st").classList.toggle("gen",S.m==="gen");$("st").classList.toggle("pil",S.m!=="gen");if(S.m!=="gen")[...$("st").children].forEach((b,j)=>{if(j)b.style.gridColumn="span "+PS[j-1]});lim();best()}
 function lim(){let L=S.m==="gen"?G:Pl,s=new Set();for(let j=0;j<4000&&s.size<60;j++){s.add(kk((S.t==="all"?P(L):L[+S.t])(S.d).t))}let c=Math.min(50,s.size),r=$("nr");N=Math.min(NP,c);r.min=Math.min(5,c);r.max=c;r.value=N;$("nv").textContent=N;$("mx").textContent=c<50?" · maximum "+c+" pour ces options":""}
 $("st").onclick=e=>{let b=e.target.closest("button");if(!b)return;S.t=b.dataset.v;rt()};
 $("sm").addEventListener("click",e=>{if(e.target.closest("button")){S.t="all";rt()}});
