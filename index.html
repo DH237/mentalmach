@@ -98,6 +98,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ac);outline-off
 #quit:active{transform:scale(.92)}
 #quit.c{background:var(--ko);color:var(--card);border-color:var(--ko)}
 #qh{display:none;flex:1;font-size:14px;color:var(--mut)}
+html.lock,html.lock body{height:100vh;height:100dvh;overflow:hidden;overscroll-behavior:none}
+html.lock main{height:100vh;height:100dvh;overflow-y:auto;overscroll-behavior:none}
 </style>
 </head>
 <body>
@@ -200,7 +202,7 @@ $("sm").addEventListener("click",e=>{if(e.target.closest("button")){S.t="all";rt
 $("sd").addEventListener("click",e=>{if(e.target.closest("button")){lim();best()}});
 rt();
 function best(){let b=st[key()];$("best").textContent=b?"Meilleur score : "+b.s+" / "+N*100+" pts en "+fmt(b.t):"Pas encore de score dans cette catégorie."}
-function show(id){["home","quiz","end"].forEach(x=>$(x).hidden=x!==id);let e=$(id);e.classList.remove("in");void e.offsetWidth;e.classList.add("in")}
+function show(id){document.documentElement.classList.toggle("lock",id==="quiz");["home","quiz","end"].forEach(x=>$(x).hidden=x!==id);let e=$(id);e.classList.remove("in");void e.offsetWidth;e.classList.add("in")}
 function tick(){$("tm").textContent=fmt(Math.floor((Date.now()-t0)/1000))}
 function start(){i=0;ok=0;pts=0;T=N;H=[];resetQ();seen=new Set();t0=Date.now();clearInterval(tmr);tmr=setInterval(tick,250);tick();show("quiz");next()}
 function next(){if(i>=T)return end();let n=0;do{let L=S.m==="gen"?G:Pl;C=(S.t==="all"?P(L):L[+S.t])(S.d)}while(seen.has(kk(C.t))&&++n<2000);if(seen.has(kk(C.t))){T=i;return end()}seen.add(kk(C.t));i++;done=false;$("pr").textContent=i+"/"+T;$("pf").style.width=((i-1)/T*100)+"%";$("pp").className="pp";{let c=document.querySelector(".card");c.className="card";void c.offsetWidth;c.className="card in"}$("sc").textContent="Score "+pts;$("q").textContent=C.t;$("u").textContent=C.u;$("a").value="";$("fb").textContent="";$("fb").className="";$("ok").textContent="Valider";$("a").focus()}
