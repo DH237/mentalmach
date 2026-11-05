@@ -112,6 +112,9 @@ html.lock main{height:100vh;height:100dvh;overflow-y:auto;overscroll-behavior:no
 @media (max-height:620px){#quiz .card{min-height:80px}}
 #quiz .main{margin-top:10px;padding:13px}
 #tm.low{color:var(--ko);font-weight:700}
+#home #sf{gap:0;padding:3px;background:var(--bd);border-radius:13px}
+#home #sf button{border:0;background:transparent;border-radius:10px;padding:5px 4px;color:var(--mut);font-weight:600;transition:background .2s,color .2s,box-shadow .2s}
+#home #sf button.on{background:var(--card);color:var(--tx);box-shadow:0 1px 4px rgba(0,0,0,.22)}
 </style>
 </head>
 <body>
@@ -127,7 +130,7 @@ html.lock main{height:100vh;height:100dvh;overflow-y:auto;overscroll-behavior:no
   <div class="seg wrap" id="st"></div>
   <div id="nq"><h2>Nombre de questions : <span id="nv">10</span><span id="mx"></span></h2>
   <input type="range" id="nr" min="5" max="50" step="1" value="10" aria-label="Nombre de questions"></div>
-  <div id="cn" hidden><h2>Contre la montre : 2 minutes</h2><p class="mut" style="margin:0">Réponds à un maximum de questions : ton score est le total des points.</p></div>
+  <div id="cn" hidden><h2>Contre la montre : 2 minutes</h2><p class="mut" style="margin:0">Marque un maximum de points.</p></div>
   <p id="best" class="mut"></p>
   <button class="main" id="go">Commencer la série</button>
   <p class="ft">© 2026 DH. Tous droits réservés.<br>Outil d'entraînement : ses valeurs approchées ne doivent pas servir à préparer ou conduire un vol réel.</p>
