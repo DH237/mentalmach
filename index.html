@@ -59,10 +59,10 @@ input[type=range]{width:100%;margin:4px 0;accent-color:var(--ac)}
 .rl li.good{border-left-color:var(--ok)}.rl li.bad{border-left-color:var(--ko)}
 .seg.wrap{flex-wrap:wrap}
 .seg.wrap button{flex:1 1 calc(50% - 4px)}
-.seg.gen{display:grid;grid-template-columns:repeat(4,1fr)}
-.seg.gen button{padding:6px 2px;font-size:12px;line-height:1.2;overflow-wrap:anywhere;hyphens:auto}
+.seg.gen{display:grid;grid-template-columns:repeat(2,1fr)}
+.seg.gen button{padding:6px 4px;line-height:1.2}
 .seg.gen button[data-v="all"]{grid-column:1/-1;padding:13px 6px;font-size:inherit}
-.seg.gen button:not([data-v="all"]){aspect-ratio:1}
+.seg.gen button:not([data-v="all"]){aspect-ratio:5/2}
 .seg{display:flex;gap:8px}
 .seg button{flex:1;padding:13px 6px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:12px;font:inherit}
 .seg button.on{background:var(--ac);color:var(--act);border-color:var(--ac);font-weight:600}
